@@ -20,25 +20,24 @@ FUENTE_MENSAJE = pygame.font.SysFont("Game Font", 24)
 FUENTE_PEQUENA = pygame.font.SysFont("Game Font", 25)
 pygame.display.set_caption("Mi Juego - Space Shooter")
 
-#  SISTEMA DE SONIDOS
+
 SONIDO_DISPARO = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonidoBala1s.mp3")
 SONIDO_INICIO = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonido Start.mp3")
 SONIDO_MUERTE = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonidoExplosion.mp3")
-#CAMBIAR RUTAS DE LOS SONIDOS
+
 SONIDO_ITEM = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonidoBala1s.mp3")
 SONIDO_NIVEL = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonidoBala1s.mp3")
 SONIDO_ESCUDO = pygame.mixer.Sound("C:\\Users\\Tiago\\Documents\\Audacity\\sonidoBala1s.mp3")
 
 SONIDO_INICIO.play()
 
-# ESTADOS DEL JUEGO
+
 jugando = True
 pausado = False
 jefe_activo = False
 
 reloj = pygame.time.Clock()
 
-#  SISTEMA DE ESTADÍSTICAS
 vidas = 3
 puntaje = 0
 nivel = 1
@@ -50,12 +49,11 @@ tiempo_pasado = 0
 tiempo_entre_enemigos = 500
 tiempo_entre_enemigos_base = 1000
 
-# SISTEMA DE MENSAJES
+
 mensaje_item = ""
 tiempo_mensaje = 0
 duracion_mensaje = 2000
 
-#  SISTEMA DE PODERES
 tiempo_velocidad_aumentada = 0
 duracion_velocidad = 25000
 velocidad_original = 500
@@ -70,7 +68,6 @@ arma_especial_activa = False
 tiempo_arma_especial = 0
 duracion_arma_especial = 20000
 
-#  LOGROS
 logros = {
     "primer_muerte": False,
     "100_puntos": False,
@@ -79,7 +76,6 @@ logros = {
     "primer_jefe": False
 }
 
-#  PARTÍCULAS
 class Particula:
     def __init__(self, x, y, color):
         self.x = x
@@ -101,11 +97,9 @@ items = []
 ultima_bala = 0
 tiempo_entre_balas = 400
 
-# Variables para controlar la generación de items
 tiempo_ultimo_item = 0
-tiempo_entre_items = 10000  # 10 segundos entre items
+tiempo_entre_items = 10000  
 
-#  CARGAR MEJOR PUNTUACIÓN
 try:
     with open('mejor_puntuacion.txt', 'r') as f:
         mejor_puntuacion = int(f.read())
@@ -180,7 +174,6 @@ def verificar_logros():
         mensaje_item = "¡LOGRO: PRIMER JEFE!"
         tiempo_mensaje = pygame.time.get_ticks()
 
-# ✅ FUNCIÓN PARA EVITAR SUPERPOSICIONES
 def evitar_superposicion(nuevo_obj, lista_objetos, min_distancia=50):
     for obj in lista_objetos:
         distancia = ((nuevo_obj.x - obj.x)**2 + (nuevo_obj.y - obj.y)**2)**0.5
@@ -205,7 +198,6 @@ while jugando and vidas > 0:
     
     tiempo_pasado += reloj.tick(FPS)
 
-    # ⚡ VERIFICAR PODERES ACTIVOS
     if velocidad_activa and tiempo_actual - tiempo_velocidad_aumentada > duracion_velocidad:
         tiempo_entre_balas = velocidad_original
         velocidad_activa = False
@@ -223,7 +215,6 @@ while jugando and vidas > 0:
         mensaje_item = "ARMA NORMAL"
         tiempo_mensaje = tiempo_actual
 
-    # 📈 SISTEMA DE NIVELES
     if puntaje >= puntos_para_siguiente_nivel:
         nivel += 1
         puntos_para_siguiente_nivel += 150
@@ -232,7 +223,6 @@ while jugando and vidas > 0:
         tiempo_mensaje = tiempo_actual
         SONIDO_NIVEL.play()
 
-    # 🐉 GENERAR JEFE CADA 3 NIVELES
     if nivel % 3 == 0 and not jefe_activo and len([e for e in enemigos if isinstance(e, Jefe)]) == 0:
         nuevo_jefe = Jefe(ANCHO//2, -150)
         enemigos.append(nuevo_jefe)
@@ -240,10 +230,9 @@ while jugando and vidas > 0:
         mensaje_item = "¡JEFE INCOMING!"
         tiempo_mensaje = tiempo_actual
 
-    # ✅ GENERAR ENEMIGOS EVITANDO SUPERPOSICIONES
     if tiempo_pasado > tiempo_entre_enemigos:
         intentos = 0
-        while intentos < 10:  # Máximo 10 intentos para evitar bucle infinito
+        while intentos < 10: 
             x_pos = random.randint(50, ANCHO-50)
             nuevo_enemigo = Enemigo(x_pos, -100)
             
@@ -256,9 +245,8 @@ while jugando and vidas > 0:
                 break
             intentos += 1
 
-    # ✅ GENERAR ITEMS EVITANDO SUPERPOSICIONES (MÁS ESCASOS)
     if (tiempo_actual - tiempo_ultimo_item > tiempo_entre_items and 
-        random.randint(1, 200) == 1):  # Modificado de 100 a 200 (más escaso)
+        random.randint(1, 200) == 1):  
         intentos = 0
         while intentos < 10:
             x_pos = random.randint(50, ANCHO-50)
@@ -270,7 +258,6 @@ while jugando and vidas > 0:
                 break
             intentos += 1
 
-    # 🎨 ACTUALIZAR PARTÍCULAS
     for particula in particulas[:]:
         particula.vida -= 1
         particula.x += particula.vel_x
@@ -295,7 +282,6 @@ while jugando and vidas > 0:
 
     VENTANA.fill("black") 
     
-    # 🎨 DIBUJAR INTERFAZ MEJORADA
     pygame.draw.rect(VENTANA, "red", (20, ALTO - 30, 200, 20))
     pygame.draw.rect(VENTANA, "green", (20, ALTO - 30, 200 * (vidas/3), 20))
     
@@ -303,55 +289,47 @@ while jugando and vidas > 0:
     pygame.draw.rect(VENTANA, "blue", (ANCHO - 220, 60, 200, 15))
     pygame.draw.rect(VENTANA, "cyan", (ANCHO - 220, 60, 200 * (progreso/100), 15))
     
-    # ✅ INDICADORES DE PODERES ACTIVOS MEJOR ORGANIZADOS
     if velocidad_activa:
         tiempo_restante = (duracion_velocidad - (tiempo_actual - tiempo_velocidad_aumentada)) // 1000
-        texto_velocidad = FUENTE.render(f"⚡{tiempo_restante}s", True, "yellow")
+        texto_velocidad = FUENTE.render(f"{tiempo_restante}s", True, "yellow")
         VENTANA.blit(texto_velocidad, (ANCHO - 120, 20))
 
     if escudo_activo:
         tiempo_restante = (duracion_escudo - (tiempo_actual - tiempo_escudo)) // 1000
-        texto_escudo = FUENTE.render(f"🛡️{tiempo_restante}s", True, "cyan")
+        texto_escudo = FUENTE.render(f"{tiempo_restante}s", True, "cyan")
         VENTANA.blit(texto_escudo, (ANCHO - 120, 70))
 
     if arma_especial_activa:
         tiempo_restante = (duracion_arma_especial - (tiempo_actual - tiempo_arma_especial)) // 1000
-        texto_arma = FUENTE.render(f"🔫{tiempo_restante}s", True, "orange")
+        texto_arma = FUENTE.render(f"{tiempo_restante}s", True, "orange")
         VENTANA.blit(texto_arma, (ANCHO - 120, 120))
 
-    # 🎨 DIBUJAR ELEMENTOS EN ORDEN CORRECTO (fondo -> partículas -> objetos -> interfaz)
     for particula in particulas:
         pygame.draw.circle(VENTANA, particula.color, (int(particula.x), int(particula.y)), particula.tamaño)
 
-    # ✅ DIBUJAR ITEMS PRIMERO (más al fondo)
     for item in items[:]:  
         item.dibujar(VENTANA)
         item.movimiento()
 
-    # ✅ DIBUJAR ENEMIGOS DESPUÉS
     for enemigo in enemigos[:]: 
         enemigo.dibujar(VENTANA)
         enemigo.movimiento()
 
-    # ✅ DIBUJAR BALAS Y JUGADOR AL FRENTE
     for bala in balas[:]:  
         bala.dibujar(VENTANA)
         bala.movimiento()
 
     cuadrado.dibujar(VENTANA)
     
-    # 🛡️ DIBUJAR ESCUDO SI ESTÁ ACTIVO (SIEMPRE AL FRENTE)
     if escudo_activo:
         pygame.draw.circle(VENTANA, "cyan", (cuadrado.rect.centerx, cuadrado.rect.centery), 40, 3)
 
-    # 🐉 BARRA DE VIDA PARA JEFES (SOBRE LOS ENEMIGOS)
     for enemigo in enemigos:
         if isinstance(enemigo, Jefe):
             ancho_barra = 100
             pygame.draw.rect(VENTANA, "red", (enemigo.x, enemigo.y - 25, ancho_barra, 8))
             pygame.draw.rect(VENTANA, "green", (enemigo.x, enemigo.y - 25, ancho_barra * (enemigo.vida/enemigo.vida_max), 8))
 
-    # ❤️ DETECCIÓN DE COLISIONES
     for enemigo in enemigos[:]: 
         if pygame.Rect.colliderect(cuadrado.rect, enemigo.rect):
             if escudo_activo:
@@ -394,12 +372,12 @@ while jugando and vidas > 0:
 
                     if isinstance(enemigo, Jefe):
                         jefe_activo = False
-                        for _ in range(2):  # Modificado de 3 a 2 (menos items del jefe)
+                        for _ in range(2):  
                             item_x = enemigo.x + random.randint(-50, 50)
                             item_y = enemigo.y + random.randint(-50, 50)
                             nuevo_item = Item(item_x, item_y)
                             items.append(nuevo_item)
-                    elif random.randint(1, 8) == 1:  # Modificado de 5 a 8 (menos frecuente)
+                    elif random.randint(1, 8) == 1: 
                         item_x = enemigo.x + enemigo.ancho/2 - 15
                         item_y = enemigo.y + enemigo.alto/2
                         nuevo_item = Item(item_x, item_y)
@@ -407,12 +385,10 @@ while jugando and vidas > 0:
                     
                     break
 
-    # ✅ ELIMINAR BALAS FUERA DE PANTALLA
     for bala in balas[:]:
         if bala.y < 0 and bala in balas:
             balas.remove(bala)
 
-    # ✅ DETECCIÓN DE COLISIÓN CON ITEMS
     for item in items[:]:  
         if pygame.Rect.colliderect(item.rect, cuadrado.rect):
             SONIDO_ITEM.play()
@@ -452,7 +428,6 @@ while jugando and vidas > 0:
         if item.y > ALTO and item in items:
             items.remove(item)
     
-    # 📊 MOSTRAR INTERFAZ
     VENTANA.blit(texto_vidas, (20, 20))
     VENTANA.blit(texto_puntos, (20, 60))
     VENTANA.blit(texto_nivel, (20, 100))
@@ -487,5 +462,6 @@ print(f"Nivel alcanzado: {nivel}")
 print(f"Enemigos eliminados: {enemigos_eliminados}")
 print(f"Mejor puntuación: {mejor_puntuacion}")
 print("============================")
+
 
 quit()
